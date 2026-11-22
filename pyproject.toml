@@ -7,6 +7,11 @@ name = "cx-d"
 version = "0.1.0"
 description = "CX-D（梦话 DreamTalk）：梦者 × 潜意识导演双 LLM 共演的独立梦境对话项目"
 readme = "README.md"
+license = {text = "MIT"}
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.110",
