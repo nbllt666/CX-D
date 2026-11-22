@@ -1,0 +1,30 @@
+# Checklist
+
+- [x] 项目骨架完整：`pyproject.toml`、`src/dreamtalk/{core,adapters}`、`web/`、`tests/`、`docs/` 存在，`python -m dreamtalk` 可启动
+- [x] 项目内不存在 `from server` / `C:\CX-O` 等 CX-O 运行期依赖
+- [x] `core/` 静态扫描无 `fastapi` / `sqlite3` / `httpx` / `dotenv` / `uvicorn` 导入，且不直接读取环境变量
+- [x] 未配置密钥或 `DREAMTALK_MOCK=1` 时自动使用 Mock LLM，`GET /api/health` 返回 `mock=true` 与 `contract_version="1.0"`
+- [x] `memory` 记忆梦为默认主模式：提交当天记忆后创建会话，两个 LLM 的 messages 包含记忆素材，且不逐条复述
+- [x] 显式 `mode="memory"` 且 `day_memories` 为空返回 422、不创建会话、不调用 LLM
+- [x] 自动模式在无当天记忆时绝不选择 `memory`
+- [x] `MemorySource` 端口可替换：`ManualMemorySource` 与 `CXOMemorySource` 切换时接口与核心代码不变
+- [x] 创建记忆梦会话返回 `director → dreamer` 两个回合，speaker/seq/created_at 完整
+- [x] 发送醒者消息后回合顺序为 `awakened → director → dreamer`；空消息只推进 `director + dreamer`
+- [x] 自动模式能产出 `memory` / `wild` / `dreamless` 三种结果，且响应包含中文 `mode_reason`
+- [x] 天马行空模式提示词与温度显著高于记忆梦，界面显示模式标识
+- [x] 一夜无梦会话 `turns=[]`、`status="ended"`、`summary` 非空，且 LLM 调用次数为 0
+- [x] 事实性断言首次出现时触发一次纠正重写；仍越界时回合 `flagged=true` 且对话不中断
+- [x] 上下文隔离：梦外哨兵文本不出现在任何发送给 LLM 的 messages 中；`DreamDialogue.build_messages()` 不接受外部历史参数
+- [x] 记忆素材只在入睡时解析一次；梦境回合期间不直接访问记忆库/图谱
+- [x] 醒来后 `GET /api/sessions/{id}/recall` 与 `GET /api/recall` 只返回摘要级字段，不含 `turns` / 原始回合
+- [x] 连续两场梦境会话之间不自动继承回合或摘要，第二场只使用新当天记忆
+- [x] `DreamTalkService` 可在不启动 FastAPI 的情况下用 Mock + 内存存储 + `ManualMemorySource` 跑通完整流程
+- [x] `EventSink` 在会话开始/回合新增/会话结束时收到事件，默认实现不报错
+- [x] 会话与回合正确落库到 `data/dreamtalk.db`，列表按时间倒序、回合按 seq 递增
+- [x] `wake` 生成标题、余韵与情绪残留；重复 wake 或结束后继续发言返回 409
+- [x] 达到最大轮数时会话自动结束并产出摘要
+- [x] Web 页面完整覆盖：今天的记忆/零散意象/情绪/模式入睡面板、梦境回合流、醒来摘要视图、梦境档案、无梦视图、继续/醒来、历史回看，且无外部 CDN 资源
+- [x] `pytest` 全部通过，覆盖模式决策、记忆源、闸门、上下文隔离、编排、存储与 API 主链路
+- [x] `docs/PORTING.md` 含模块映射（含 collector → CXOMemorySource）、端口替换清单、配置映射、隔离保证与回装步骤
+- [x] `README.md` 含安装、环境变量、启动、三种模式说明、上下文隔离、API 与测试指引
+- [x] `.env.example` 齐全且不含真实密钥；`.gitignore` 排除 `.env`、`data/`、缓存

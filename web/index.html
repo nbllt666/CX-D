@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>DreamTalk · 梦话</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-moon" aria-hidden="true"></div>
+          <div>
+            <h1>梦话</h1>
+            <p>DreamTalk</p>
+          </div>
+        </div>
+        <button id="new-dream" class="new-btn" type="button">＋ 新的一场梦</button>
+        <div class="history-head">
+          <span>梦境档案</span>
+          <span id="history-count">0</span>
+        </div>
+        <nav id="history-list" class="history" aria-label="历史梦境"></nav>
+        <div class="sidebar-foot">
+          <p>梦内与梦外上下文隔离</p>
+          <p>醒来只带走一段摘要</p>
+        </div>
+      </aside>
+
+      <main class="stage">
+        <div class="stage-glow" aria-hidden="true"></div>
+
+        <!-- 入睡 -->
+        <section id="view-setup" class="view">
+          <div class="hero">
+            <p class="eyebrow">今夜，谁在替你做梦</p>
+            <h2>把白天的碎片<br />交给潜意识</h2>
+            <p class="lede">
+              写下今天的记忆，梦者与潜意识导演会替你把它们织成一场梦。
+              你可以随时开口，也可以只是看着。
+            </p>
+          </div>
+
+          <form id="sleep-form" class="sleep-card">
+            <label class="field" for="memories">
+              <span>今天的记忆 <em>每行一条</em></span>
+              <textarea
+                id="memories"
+                rows="5"
+                placeholder="午后在便利店听到一首旧歌&#10;和同事争了一句，后来忘了为什么&#10;窗台上的灰，像一层很薄的雪"
+              ></textarea>
+            </label>
+
+            <label class="field" for="entities">
+              <span>零散意象 <em>可选，逗号分隔</em></span>
+              <input id="entities" placeholder="旧钥匙、没有地址的信、倒挂的窗" />
+            </label>
+
+            <div class="row">
+              <fieldset class="moods">
+                <legend>情绪</legend>
+                <label><input type="radio" name="mood" value="calm" checked /><span>平静</span></label>
+                <label><input type="radio" name="mood" value="joy" /><span>愉悦</span></label>
+                <label><input type="radio" name="mood" value="low" /><span>低落</span></label>
+                <label><input type="radio" name="mood" value="anxious" /><span>焦躁</span></label>
+              </fieldset>
+
+              <label class="mode-select" for="mode">
+                <span>模式</span>
+                <select id="mode">
+                  <option value="auto">自动决定</option>
+                  <option value="memory">记忆梦</option>
+                  <option value="wild">天马行空</option>
+                  <option value="dreamless">一夜无梦</option>
+                </select>
+              </label>
+            </div>
+
+            <button type="submit" class="primary" id="sleep-btn">入睡</button>
+            <p class="hint">
+              未配置 API Key 时自动使用离线 Mock 梦境。梦境只读取本次素材，不读取任何梦外对话。
+            </p>
+          </form>
+        </section>
+
+        <!-- 梦境 -->
+        <section id="view-dream" class="view hidden">
+          <header class="dream-head">
+            <div>
+              <span id="dream-mode" class="badge"></span>
+              <p id="dream-reason" class="reason"></p>
+            </div>
+            <button id="wake-btn" class="ghost" type="button">醒来</button>
+          </header>
+
+          <div id="turns" class="turns" aria-live="polite"></div>
+          <div id="typing" class="typing hidden">
+            <span></span><span></span><span></span> 潜意识正在显影…
+          </div>
+
+          <form id="speak-form" class="speak">
+            <input id="speak-input" placeholder="说点什么，或直接继续做梦" autocomplete="off" />
+            <button type="button" id="continue-btn" class="ghost">继续</button>
+            <button type="submit" class="primary">开口</button>
+          </form>
+        </section>
+
+        <!-- 醒来 -->
+        <section id="view-wake" class="view hidden">
+          <div class="wake-card">
+            <p class="eyebrow">梦醒</p>
+            <h2 id="wake-title">无名之梦</h2>
+            <p id="wake-summary" class="wake-summary"></p>
+            <div id="wake-emotion" class="emotion-residue"></div>
+            <p class="hint">梦的原文只留在梦境档案里，清醒侧只带走这段摘要。</p>
+            <div class="actions">
+              <button id="archive-btn" class="ghost" type="button">查看梦境档案</button>
+              <button id="again-btn" class="primary" type="button">再做一场</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 一夜无梦 -->
+        <section id="view-dreamless" class="view hidden">
+          <div class="dreamless-card">
+            <div class="quiet-moon" aria-hidden="true"></div>
+            <p class="eyebrow">Dreamless</p>
+            <h2>今夜无梦</h2>
+            <p id="dreamless-reason"></p>
+            <p class="hint">没有画面，也没有声音。意识沉进黑暗里，安静地休息了一晚。</p>
+            <div class="actions">
+              <button id="dreamless-again" class="primary" type="button">再来一晚</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 梦境档案 -->
+        <section id="view-archive" class="view hidden">
+          <header class="dream-head">
+            <div>
+              <span class="badge archive-badge">梦境档案</span>
+              <p id="archive-reason" class="reason"></p>
+            </div>
+            <button id="back-wake" class="ghost" type="button">回到摘要</button>
+          </header>
+          <div id="archive-turns" class="turns"></div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast hidden" role="status"></div>
+    <script src="/app.js"></script>
+  </body>
+</html>
